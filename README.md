@@ -12,3 +12,5 @@ of Campylobacter spp. in poultry carcasses in slaughterhouses and in retail. Sec
 response assessment, probability of infection and probability of illness are described. In the risk
 characterization, information is combined to study the probability of occurrence and severity of
 adverse health effects due to exposure with Campylobacter spp. from eating salad.
+
+Under the file **Project1.R**, the according files are included.
