@@ -13,4 +13,4 @@ response assessment, probability of infection and probability of illness are des
 characterization, information is combined to study the probability of occurrence and severity of
 adverse health effects due to exposure with Campylobacter spp. from eating salad.
 
-Under the file **Project1.R**, the according files are included.
+  Under the file **Project1.R**, the according code for the first assignment is included.
