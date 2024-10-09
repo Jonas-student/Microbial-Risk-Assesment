@@ -19,8 +19,7 @@ simulation <- function(N){
   Sc <- rep(NA,N)  
   Rr <- rep(NA,N)
   Rf <- rep(NA,N)
-  Cref <- rep(NA,N)
-  Cfre <- rep(NA,N)
+  Ch <- rep(NA,N)
   Ccs <- rep(NA,N)
   C <- rep(NA,N)
   Pinf1 <- rep(NA,N)
@@ -85,27 +84,27 @@ simulation <- function(N){
     
     
     ## Freeze reduction
-    Rf[i] <- runif(1 , 0.6 , 2.87)
+    Rf[i] <- runif(n = 1 , min = 0.6 , max = 2.87)
     
     
-    ## Number of Campylobacter spp. in poultry carcasses stored under refrigeration
-    Cref[i] <- 10^(Cr[i] - Rr[i])
-    
-    
-    ## Number of Campylobacter spp. in poultry carcasses stored under freeze
-    Cfre[i] <- 10^(Cr[i] - Rf[i])
-    
+    if (Sc[i]==1){
+      ## Number of Campylobacter spp. in poultry carcasses stored under refrigeration
+      Ch[i] <- 10^(Cr[i] - Rr[i])
+    }else{
+      ## Number of Campylobacter spp. in poultry carcasses stored under freeze
+      Ch[i] <- 10^(Cr[i] - Rf[i])
+    }
     
     ## Four people
     Ns <- 4
     
-    
     ## Number of Campylobacter spp. per serving of salad (C_salad)
-    Ccs[i] <- Sc[i] * rpois(1 , Cref[i] / Ns) + (1 - Sc[i]) * rpois(1 , Cfre[i] / Ns) 
+    Ccs[i] <- rpois(1 , Ch[i] / Ns)
+    
     
     ## Number of Campylobacter spp. per serving after cooking 
     Rc <- rbeta(n = 1 , shape1 = 10 , shape2 = 0.05)
-    C[i] <- Ccs[i] * Rc
+    C[i] <- Ccs[i] * 10^(-Rc)
     
     
     ## (Cross-contamination during food preparation based)
@@ -116,7 +115,7 @@ simulation <- function(N){
     
     ## Probability of infection for an individual consuming a meal given the dose
     Pinf1[i] <- rbeta(1 , 0.21 , 59.95)
-    Pinf[i] <- 1 - (1 - Pinf1[i])^C[i]
+    Pinf[i] <- 1 - (1 - Pinf1[i])^C[i]# this should be the concentration coming from salad
     
     
     ## Probability of illness
@@ -130,17 +129,21 @@ simulation <- function(N){
     Npc <- 495143444
     
     if(Pill[i]!=0){
-    ## Number of human cases/year (Ns-p?)
-    Nill[i] <- rbinom(n = 1 , size = Npc * Ns * 1, prob = Pill[i])
+      ## Number of human cases/year
+      Nill[i] <- rbinom(n = 1 , size = Npc * Ns * 1, prob = Pill[i])
     }else{
-    Nill[i] <- 0  
+      Nill[i] <- 0  
     }
   
   }
-  return(Nill)
+  return(matrix( data = c(Cr , Ch , C , Pill , Nill) , nrow = N , ncol = 5))
 }
 
 ### Visualisation of the results -----------------------------------------------
-plot(density(simulation(100)))
+out <- simulation(1000)
+
+## Plot simular to Fig 2.
+plot(ecdf((out[,1])),xlim=c(-4,4))
+lines(ecdf(log10(out[,2])),col="red")
 
 
