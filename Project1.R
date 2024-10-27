@@ -162,16 +162,18 @@ out <- data.frame(simulation(N = 100000 , FreezeOnly = 0))
 ## in a single serving of poultry meat? !!--> change y-axis!!
 
 # Visualisations
-plot1 <- ggplot(aes(x=X5) , data=out) + geom_histogram(fill="#69b3a2",
-binwidth = 1 , alpha=0.8 ) + ggtitle("Number of Campylobacter spp. per serving") +
-labs(y = "Density", x = "MPN per serving") + theme_minimal() + xlim(-1,400)
+plot1 <- ggplot(aes(x=X5) , data=out) + geom_histogram(aes(y = ..density..),fill="#69b3a2",
+  binwidth = 1 , alpha=1 ) + 
+  labs(y = "Density", x = "MPN per serving") + theme_minimal() + 
+  ylim(0,0.6)
 
-plot2 <- ggplot(aes(x=X5) , data=out) + geom_histogram(fill="#69b3a2", color="#e9ecef",
-binwidth = 1 , alpha=0.8 ) + ggtitle("Number of Campylobacter spp. per serving") +
-labs(y = "Density", x = "MPN per serving") + theme_minimal() + xlim(-1,51)+
-  geom_vline(xintercept=10, color="gray", linetype="dashed", size=0.7)
+plot2 <- ggplot(aes(x=X5) , data=out) + geom_histogram(aes(y = ..density..),
+  fill="#69b3a2", color="#e9ecef", binwidth = 1  ) + 
+  labs(y = "Density", x = "MPN per serving") + theme_minimal() + xlim(-1,80)+
+  geom_vline(xintercept=10, color="gray", linetype="dashed", size=0.7) + 
+  ylim(0,0.6)
 
-grid.arrange(plot1 , plot2 , ncol=2)
+grid.arrange(plot1 , plot2 , ncol=2 , top = "Number of Campylobacter spp. per serving")
 
 
 # Summary statistics !!add aditional one (HPD)!!
