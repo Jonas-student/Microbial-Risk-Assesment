@@ -152,6 +152,9 @@ simulation <- function(N , FreezeOnly){
 ## Load libraries
 library(ggplot2)
 library(gridExtra)
+library(coda)
+library(grid)
+
 
 
 ## Output from the simulation model
@@ -168,34 +171,38 @@ plot1 <- ggplot(aes(x=X5) , data=out) + geom_histogram(aes(y = ..density..),fill
   ylim(0,0.6)
 
 plot2 <- ggplot(aes(x=X5) , data=out) + geom_histogram(aes(y = ..density..),
-  fill="#69b3a2", color="#e9ecef", binwidth = 1  ) + 
-  labs(y = "Density", x = "MPN per serving") + theme_minimal() + xlim(-1,80)+
-  geom_vline(xintercept=10, color="gray", linetype="dashed", size=0.7) + 
+  fill="#69b3a2", color="#e9ecef", binwidth = 1.07) + 
+  labs(y = "Density", x = "MPN per serving") + theme_minimal() + xlim(-1,48)+
+  geom_vline(xintercept=10, color="gray1", linetype="dashed", size=0.75) + 
   ylim(0,0.6)
 
-grid.arrange(plot1 , plot2 , ncol=2 , top = "Number of Campylobacter spp. per serving")
+title <- textGrob("Number of Campylobacter spp. per serving", gp=gpar(fontsize=18))
+grid.arrange(plot1, plot2, ncol=2, top=title)
 
 
-# Summary statistics !!add aditional one (HPD)!!
+# Summary statistics !!add aditional one (HPD)!! (Lode)
 sum(out$X5<49)/100000
 median(out$X5)
+overall_summary <- summary(out)
+overall_summary
+mcmc_out <- as.mcmc(out)
+HPDinterval(mcmc_out, prob= 0.95)
 
-
-## 3.2 How common is an exposure to doses > 10 MPN/meat serving?
+## 3.2 How common is an exposure to doses > 10 MPN/meat serving? (Lode)
 sum(out$X5>10)/100000
 
 
-## 3.3 What is the prevalence of meat contamination?
+## 3.3 What is the prevalence of meat contamination? (Lode)
 sum(out$X5>0)/100000
 
 
-## 3.4 What is the probability of illness for a single meal of chicken?
+## 3.4 What is the probability of illness for a single meal of chicken? (Lode)
 mean(out$X6)
 
-ggplot(aes(x=X6) , data=out) +  geom_histogram(fill="#69b3a2", color="#e9ecef",
+ggplot(aes(x=X6) , data=out) +  geom_histogram(aes(y = ..density../100),fill="#69b3a2", color="#e9ecef",
 alpha=0.8 , binwidth = 0.01) +
   ggtitle("Probability of illness per serving") + labs(y = "Density", x = "Probability of illnes")+
-  theme_minimal() + xlim(-0.01,1.01)
+  theme_minimal() + xlim(-0.01,0.45) + theme(plot.title = element_text(size = 20, hjust = 0.5))
 
 
 ## 3.5 Estimate the number of people who could suffer from campylobacteriosis 
