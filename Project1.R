@@ -14,7 +14,7 @@ simulation <- function(N , Storage){
   # - Storage : 2 storage condition always fresh
   #             1 storage condition always freezing 
   #             0 storage condition has two options freeze/fresh
-
+  
   ### Define all variables -----------------------------------------------------
   Ps <- rep(NA,N)       # Prevalence in poultry carcasses at slaughterhouses
   Pr <- rep(NA,N)       # Prevalence in poultry carcasses at retail
@@ -34,7 +34,7 @@ simulation <- function(N , Storage){
   Pill <- rep(NA,N)     # Probability of illness
   Nill <- rep(NA,N)     # Number of human cases/year
   
-    
+  
   ## simulate N times
   for(i in 1:N){
     
@@ -54,7 +54,7 @@ simulation <- function(N , Storage){
     
     # Sample the intervals according to the cumulative distribution
     index <- sample(x , size = 1 , 
-                 prob = c(0.325 , 0.15 , 0.175 , 0.05 , 0.15 , 0.125 , 0.025))
+                    prob = c(0.325 , 0.15 , 0.175 , 0.05 , 0.15 , 0.125 , 0.025))
     
     # Define the piecewise boundaries
     Cmin <- c(-2.079 , 1.556 , 2.301 , 2.699 , 3    , 3.699, 4    )
@@ -74,7 +74,7 @@ simulation <- function(N , Storage){
     
     ## Uncertainty about the storage condition
     if (Storage==0){
-    Sc[i] <- rbinom(n = 1 , size = 1, prob = runif(1 , min = 0 , max = 1))
+      Sc[i] <- rbinom(n = 1 , size = 1, prob = runif(1 , min = 0 , max = 1))
     }else if(Storage==1){
       Sc[i] <- 0
     }else{
@@ -117,7 +117,7 @@ simulation <- function(N , Storage){
     
     ## Number of Campylobacter spp. per serving
     Cps[i] <- rpois(1 , Cc[i] / Ns)
-   
+    
     
     ## (Cross-contamination during food preparation based)
     # not necessary for the assignment
@@ -145,7 +145,7 @@ simulation <- function(N , Storage){
     }else{
       Nill[i] <- 0  
     }
-  
+    
   }
   return(matrix( data = c(Ps , Pr , Sc , Rc ,  Cps , Pill , Nill) , nrow = N , ncol = 7))
 }
@@ -168,7 +168,7 @@ out <- data.frame(simulation(N = 100000 , Storage = 0))
 
 # Visualisations
 plot1 <- ggplot(aes(x=X5) , data=out) + geom_histogram(aes(y = ..density..),
-                            fill="#69b3a2",binwidth = 1 , alpha=1 ) +
+                                                       fill="#69b3a2",binwidth = 1 , alpha=1 ) +
   labs(y = "Density", x = "MPN per serving") + theme_minimal() +
   ylim(0,0.6)
 
@@ -201,14 +201,10 @@ sum(out$X6<0.0276)/100000
 
 ggplot(aes(x=X6) , data=out) +  
   geom_histogram(aes(y = ..density../100),fill="#69b3a2", color="#e9ecef",
-                                               alpha=0.8 , binwidth = 0.01) +
+                 alpha=0.8 , binwidth = 0.01) +
   ggtitle("Probability of illness per serving") + 
   labs(y = "Density", x = "Probability of illnes")+
-<<<<<<< HEAD
   theme_minimal() + xlim(-0.01,0.3) + 
-=======
-  theme_minimal() + xlim(-0.01,0.45) + 
->>>>>>> b7acb2511ec87338af21033c1c4e4f28d9d97b10
   theme(plot.title = element_text( hjust = 0.5))
 
 
@@ -223,8 +219,8 @@ confint(model)
 
 correlation <- data.frame(coef = cor(out , method = "pearson")[1:5,6])
 correlation$factores <- c("Prevalence in poultry carcasses at slaughterhouses", 
-  "Prevalence in poultry carcasses at retail", "Storage condition" , 
-  "Cooking reduction  " , "Number (MPN) of Campylobacter per serving")
+                          "Prevalence in poultry carcasses at retail", "Storage condition" , 
+                          "Cooking reduction  " , "Number (MPN) of Campylobacter per serving")
 
 correlation[3,1] <- biserial.cor(x=out$X6, y=out$X3, use = c("all.obs"),level=2)
 
@@ -260,4 +256,28 @@ ggplot(a_long, aes(x = as.factor(mids), y = counts, fill = type)) +
   scale_fill_discrete(labels = c("Refrigerator", "Freezer"))+
   scale_x_discrete(breaks = c("0.05", "0.15", "0.25", "0.35", "0.45")) +  # Set specific x-axis labels
   theme_minimal()
+
+
+
+#------------------------------------------------------------------------------#
+
+# Additional graph: Pearson vs Spearman
+
+
+data <- data.frame(
+  Campylobacter_per_serving = out$X5,  # Number of Campylobacter spp. per serving
+  Probability_of_Illness = out$X6      # Probability of illness
+)
+
+# Scatter plot with a linear fit
+ggplot(data, aes(x = Campylobacter_per_serving, y = Probability_of_Illness)) +
+  geom_point(alpha = 0.5, color = "blue") +        
+  geom_smooth(method = "lm", color = "red", se = FALSE) +  
+  labs(
+    title = "Relationship Between Campylobacter spp. per Serving and Probability of Illness",
+    x = "MPN of Campylobacter spp. per Serving ",
+    y = "Probability of Illness"
+  ) +
+  theme_minimal()
+
 
