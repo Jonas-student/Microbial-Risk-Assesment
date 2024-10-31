@@ -204,7 +204,11 @@ ggplot(aes(x=X6) , data=out) +
                                                alpha=0.8 , binwidth = 0.01) +
   ggtitle("Probability of illness per serving") + 
   labs(y = "Density", x = "Probability of illnes")+
+<<<<<<< HEAD
   theme_minimal() + xlim(-0.01,0.3) + 
+=======
+  theme_minimal() + xlim(-0.01,0.45) + 
+>>>>>>> b7acb2511ec87338af21033c1c4e4f28d9d97b10
   theme(plot.title = element_text( hjust = 0.5))
 
 
