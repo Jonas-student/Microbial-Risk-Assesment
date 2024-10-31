@@ -75,8 +75,7 @@ simulation <- function(N , Storage){
     ## Uncertainty about the storage condition
     if (Storage==0){
     Sc[i] <- rbinom(n = 1 , size = 1, prob = runif(1 , min = 0 , max = 1))
-    }
-    if(Storage==1){
+    }else if(Storage==1){
       Sc[i] <- 0
     }else{
       Sc[i] <- 1 
@@ -179,13 +178,12 @@ plot2 <- ggplot(aes(x=X5) , data=out) + geom_histogram(aes(y = ..density..),
   geom_vline(xintercept=10, color="gray1", linetype="dashed", size=0.75) +
   ylim(0,0.6)
 
-title <- textGrob("Number of Campylobacter spp. per serving", gp=gpar(fontsize=18))
+title <- textGrob("Number of Campylobacter spp. per serving")
 grid.arrange(plot1, plot2, ncol=2, top=title)
 
 
 # Summary statistics 
-sum(out$X5<49)/100000
-median(out$X5)
+sum(out$X5<48)/100000
 
 
 ## 3.2 How common is an exposure to doses > 10 MPN/meat serving?
@@ -194,29 +192,32 @@ sum(out$X5>10)/100000
 
 ## 3.3 What is the prevalence of meat contamination?
 sum(out$X5>0)/100000
+sum(out$X5==0)/100000
 
 
 ## 3.4 What is the probability of illness for a single meal of chicken?
 mean(out$X6)
+sum(out$X6<0.0276)/100000
 
 ggplot(aes(x=X6) , data=out) +  
   geom_histogram(aes(y = ..density../100),fill="#69b3a2", color="#e9ecef",
                                                alpha=0.8 , binwidth = 0.01) +
   ggtitle("Probability of illness per serving") + 
   labs(y = "Density", x = "Probability of illnes")+
-  theme_minimal() + xlim(-0.01,0.45) + 
-  theme(plot.title = element_text(size = 20, hjust = 0.5))
+  theme_minimal() + xlim(-0.01,0.3) + 
+  theme(plot.title = element_text( hjust = 0.5))
 
 
 ## 3.5 Estimate the number of people who could suffer from campylobacteriosis
 ## related to poultry meat consumption.
 mean(out$X7)
-
+model<-lm(out$X7~1)
+confint(model)
 
 ## 3.6 Investigate using Spearman’s rank correlation coefficients which factors 
 ## in the chain have the largest impact on the risk of illness.
 
-correlation <- data.frame(coef = cor(out , method = "spearman")[1:5,6])
+correlation <- data.frame(coef = cor(out , method = "pearson")[1:5,6])
 correlation$factores <- c("Prevalence in poultry carcasses at slaughterhouses", 
   "Prevalence in poultry carcasses at retail", "Storage condition" , 
   "Cooking reduction  " , "Number (MPN) of Campylobacter per serving")
